@@ -69,23 +69,22 @@ class EnterDetailsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_enter_details, container, false)
 
-        enterDetailsViewModel.enterDetailsState.observe(this,
-            Observer<EnterDetailsViewState> { state ->
-                when (state) {
-                    is EnterDetailsSuccess -> {
+        enterDetailsViewModel.enterDetailsState.observe(this, Observer { state ->
+            when (state) {
+                is EnterDetailsSuccess -> {
 
-                        val username = usernameEditText.text.toString()
-                        val password = passwordEditText.text.toString()
-                        registrationViewModel.updateUserData(username, password)
+                    val username = usernameEditText.text.toString()
+                    val password = passwordEditText.text.toString()
+                    registrationViewModel.updateUserData(username, password)
 
-                        (activity as RegistrationActivity).onDetailsEntered()
-                    }
-                    is EnterDetailsError -> {
-                        errorTextView.text = state.error
-                        errorTextView.visibility = View.VISIBLE
-                    }
+                    (activity as RegistrationActivity).onDetailsEntered()
                 }
-            })
+                is EnterDetailsError -> {
+                    errorTextView.text = state.error
+                    errorTextView.visibility = View.VISIBLE
+                }
+            }
+        })
 
         setupViews(view)
         return view
