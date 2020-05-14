@@ -20,23 +20,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.example.android.dagger.MyApplication
 import com.example.android.dagger.R
 import com.example.android.dagger.login.LoginActivity
-import javax.inject.Inject
+import com.example.android.dagger.user.UserManager
+import org.koin.android.ext.android.getKoin
+import org.koin.android.scope.currentScope
 
 class SettingsActivity : AppCompatActivity() {
 
-    // @Inject annotated fields will be provided by Dagger
-    @Inject
     lateinit var settingsViewModel: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        // Gets the userManager from the application graph to obtain the UserComponent
-        // and gets this Activity injected
-        val userManager = (application as MyApplication).appComponent.userManager()
-        userManager.userComponent!!.inject(this)
+        val userManager = getKoin().get<UserManager>()
+        settingsViewModel = currentScope.get<SettingsViewModel>()
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)

@@ -16,33 +16,28 @@
 
 package com.example.android.dagger.storage
 
-import com.example.android.dagger.user.UserComponent
+import com.example.android.dagger.di.sessionModule
 import com.example.android.dagger.user.UserManager
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.test.KoinTest
 
-class UserManagerTest {
-
-    private lateinit var storage: Storage
-    private lateinit var userManager: UserManager
+class UserManagerTest : KoinTest {
 
     @Before
     fun setup() {
-        val userComponentFactory = Mockito.mock(UserComponent.Factory::class.java)
-        val userComponent = Mockito.mock(UserComponent::class.java)
-        `when`(userComponentFactory.create()).thenReturn(userComponent)
-
-        storage = FakeStorage()
-        userManager = UserManager(storage, userComponentFactory)
+        startKoin {
+            modules(testModule, sessionModule)
+        }
     }
 
     @Test
     fun `Username returns what is in the storage`() {
+        val userManager = getKoin().get<UserManager>()
         assertEquals("", userManager.username)
 
         userManager.registerUser("username", "password")
@@ -52,6 +47,7 @@ class UserManagerTest {
 
     @Test
     fun `IsUserRegistered behaves as expected`() {
+        val userManager = getKoin().get<UserManager>()
         assertFalse(userManager.isUserRegistered())
 
         userManager.registerUser("username", "password")
@@ -61,6 +57,9 @@ class UserManagerTest {
 
     @Test
     fun `Register user adds username and password to the storage`() {
+        val userManager = getKoin().get<UserManager>()
+        val storage = getKoin().get<Storage>()
+
         assertFalse(userManager.isUserRegistered())
         assertFalse(userManager.isUserLoggedIn())
 
@@ -74,6 +73,7 @@ class UserManagerTest {
 
     @Test
     fun `Login succeeds when username is registered and password is correct`() {
+        val userManager = getKoin().get<UserManager>()
         userManager.registerUser("username", "password")
         userManager.logout()
 
@@ -83,6 +83,7 @@ class UserManagerTest {
 
     @Test
     fun `Login fails when username is not registered`() {
+        val userManager = getKoin().get<UserManager>()
         userManager.registerUser("username", "password")
         userManager.logout()
 
@@ -92,6 +93,7 @@ class UserManagerTest {
 
     @Test
     fun `Login fails when username is registered but password is incorrect`() {
+        val userManager = getKoin().get<UserManager>()
         userManager.registerUser("username", "password")
         userManager.logout()
 
@@ -101,11 +103,17 @@ class UserManagerTest {
 
     @Test
     fun `Unregister behaves as expected`() {
+        val userManager = getKoin().get<UserManager>()
         userManager.registerUser("username", "password")
         assertTrue(userManager.isUserLoggedIn())
 
         userManager.unregister()
         assertFalse(userManager.isUserLoggedIn())
         assertFalse(userManager.isUserRegistered())
+    }
+
+    @After
+    fun autoClose() {
+        stopKoin()
     }
 }

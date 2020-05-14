@@ -17,19 +17,20 @@
 package com.example.android.dagger
 
 import android.app.Application
-import com.example.android.dagger.di.AppComponent
-import com.example.android.dagger.di.DaggerAppComponent
+import com.example.android.dagger.di.*
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.logger.AndroidLogger
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
 open class MyApplication : Application() {
 
-    // Instance of the AppComponent that will be used by all the Activities in the project
-    val appComponent: AppComponent by lazy {
-        initializeComponent()
-    }
-
-    open fun initializeComponent(): AppComponent {
-        // Creates an instance of AppComponent using its Factory constructor
-        // We pass the applicationContext that will be used as Context in the graph
-        return DaggerAppComponent.factory().create(applicationContext)
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            logger(AndroidLogger(Level.DEBUG))
+            androidContext(applicationContext)
+            modules(appModule, loginModule, registrationModule, sessionModule)
+        }
     }
 }

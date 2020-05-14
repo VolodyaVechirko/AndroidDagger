@@ -16,9 +16,7 @@
 
 package com.example.android.dagger.storage
 
-import javax.inject.Inject
-
-class FakeStorage @Inject constructor(): Storage {
+class FakeStorage: Storage {
 
     private val map = mutableMapOf<String, String>()
 

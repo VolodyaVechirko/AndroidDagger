@@ -16,16 +16,17 @@
 
 package com.example.android.dagger
 
-import com.example.android.dagger.di.AppComponent
-import com.example.android.dagger.di.DaggerTestAppComponent
+import android.app.Application
+import com.example.android.dagger.di.*
+import org.koin.core.context.loadKoinModules
 
 /**
  * MyTestApplication will override MyApplication in android tests
  */
-class MyTestApplication : MyApplication() {
+class MyTestApplication : Application() {
 
-    override fun initializeComponent(): AppComponent {
-        // Creates a new TestAppComponent that injects fakes types
-        return DaggerTestAppComponent.create()
+    override fun onCreate() {
+        super.onCreate()
+//        loadKoinModules(testModule)
     }
 }
